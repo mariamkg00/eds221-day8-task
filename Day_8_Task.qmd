@@ -1,0 +1,64 @@
+---
+title: "Day 8 Task"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+
+
+library(patchwork)
+library(ggrepel)
+library(gghighlight)
+library(paletteer)
+library(gapminder)
+
+```
+
+```{r}
+space_launches <- read_csv("space_launches.csv")
+
+
+ggplot(data = space_launches, aes(x = launch_year, y = agency))+
+  geom_point() +
+  theme_get()+
+  scale_x_continuous(breaks = seq(from = 1950, to = 2020, by = 40))
+
+```
+
+```{r}
+#Task 2
+sf_emissions <- read_csv("San_Francisco_Communitywide_Greenhouse_Gas_Inventory.csv")
+
+
+sf_emissions_sector <-sf_emissions %>%
+  group_by(Sector_General) %>% 
+  summarize(total_emissions = sum(Emissions_mtCO2e, na.rm = TRUE))
+
+  
+
+sf_emissions_year_commodity <- sf_emissions %>% 
+  group_by(Calendar_Year, Commodity_Type) %>% 
+  summarize(total_yearly_emissions = sum(Emissions_mtCO2e))
+
+sf_emissions_2005 <- sf_emissions %>% 
+  filter(Calendar_Year > 2005 & str_detect(Sector_Detail2, pattern = "PG&E")) %>% 
+  select(Calendar_Year,Sector_Detail2,Emissions_mtCO2e)
+  
+  
+```
+
+```{r}
+#task 3 
+
+sf_emissions_2005 %>% 
+  filter(str_detect(Sector_Detail2 , pattern = "Residential" )) %>% 
+           ggplot()+
+  geom_col(aes(y= Sector_Detail2, x = Emissions_mtCO2e), fill = "purple")+
+  xlab("CO2 Emissions")+
+  ylab('Sector')+
+  ggtitle("CO2 Emissions in Residential Areas of San Francisco in 2005")
+```
